@@ -1,5 +1,6 @@
 "use client";
 import {
+  Button,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -7,31 +8,32 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
-  ToggleButton,
-  ToggleButtonGroup,
 } from "@mui/material";
 import React from "react";
+import { clearFilter, handleFilter, selectJobs } from "../store/jobsSlice";
+import { useAppDispatch, useAppSelector } from "../hooks/reduxHook";
+
+const filters = {
+  locations: ["Brussels", "Madrid", "Remote"],
+  types: ["Full-Time", "Part-Time", "Temporary"],
+  salary_ranges: ["0-30k", "30-60k", "60k+"],
+};
 
 const FilterSection: React.FC = () => {
-  const [alignment, setAlignment] = React.useState<string | null>("left");
-  const [state, setState] = React.useState({
-    fullTime: false,
-    temporary: false,
-    partTime: false,
-  });
-  const { fullTime, temporary, partTime } = state;
-  const handleChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newAlignment: string | null
-  ) => {
-    setAlignment(newAlignment);
-  };
+  const dispatch = useAppDispatch();
+  const filter = useAppSelector(selectJobs);
+  const [state, setState] = React.useState<string[]>([]);
 
   const handleChangeCheck = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setState({
-      ...state,
-      [event.target.name]: event.target.checked,
-    });
+    state.find((item) => item === event.target.name)
+      ? (setState(state.filter((item) => item !== event.target.name)),
+        dispatch(
+          handleFilter({
+            type: state.filter((item) => item !== event.target.name),
+          })
+        ))
+      : (setState([...state, event.target.name]),
+        dispatch(handleFilter({ type: [...state, event.target.name] })));
   };
   return (
     <section className=" bg-white p-6 rounded-lg">
@@ -41,96 +43,62 @@ const FilterSection: React.FC = () => {
           <FormLabel id="demo-radio-buttons-group-label">Location</FormLabel>
           <RadioGroup
             aria-labelledby="demo-radio-buttons-group-label"
-            defaultValue="nearme"
             name="radio-buttons-group"
           >
-            <FormControlLabel
-              value="nearme"
-              control={<Radio />}
-              label="Near me"
-            />
-            <FormControlLabel
-              value="remotejob"
-              control={<Radio />}
-              label="Remote job"
-            />
-            <FormControlLabel
-              value="exactlocation"
-              control={<Radio />}
-              label="Exact location"
-            />
-            <FormControlLabel
-              value="within15km"
-              control={<Radio />}
-              label="Within 15 km"
-            />
-            <FormControlLabel
-              value="within30km"
-              control={<Radio />}
-              label="Within 30 km"
-            />
-            <FormControlLabel
-              value="within50km"
-              control={<Radio />}
-              label="Within 50 km"
-            />
+            {filters.locations.map((location) => (
+              <FormControlLabel
+                key={location}
+                value={location}
+                control={
+                  <Radio
+                    name={location}
+                    onChange={() => dispatch(handleFilter({ location }))}
+                  />
+                }
+                label={location}
+              />
+            ))}
           </RadioGroup>
         </FormControl>
         <FormControl component="fieldset" variant="standard">
           <FormLabel component="legend">Salary</FormLabel>
-          <ToggleButtonGroup
-            color="primary"
-            value={alignment}
-            exclusive
-            onChange={handleChange}
-            aria-label="Platform"
-          >
-            <ToggleButton value="hourly" aria-label="left aligned">
-              hourly
-            </ToggleButton>
-            <ToggleButton value="monthly" aria-label="centered">
-              monthly
-            </ToggleButton>
-            <ToggleButton value="yearly" aria-label="right aligned">
-              yearly
-            </ToggleButton>
-          </ToggleButtonGroup>
+          <div className="flex flex-wrap gap-2">
+            {filters.salary_ranges.map((salary_range) => (
+              <div
+                key={salary_range}
+                className={`p-2 rounded-md cursor-pointer ${
+                  salary_range == filter?.salary_range
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 "
+                }`}
+                onClick={() => dispatch(handleFilter({ salary_range }))}
+              >
+                {salary_range}
+              </div>
+            ))}
+          </div>
         </FormControl>
         <FormControl component="fieldset" variant="standard">
           <FormLabel component="legend">Type of employment</FormLabel>
           <FormGroup>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={fullTime}
-                  onChange={handleChangeCheck}
-                  name="fullTime"
-                />
-              }
-              label="full-time"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={temporary}
-                  onChange={handleChangeCheck}
-                  name="temporary"
-                />
-              }
-              label="temporary"
-            />
-            <FormControlLabel
-              control={
-                <Checkbox
-                  checked={partTime}
-                  onChange={handleChangeCheck}
-                  name="partTime"
-                />
-              }
-              label="part-time"
-            />
+            {filters.types.map((type) => (
+              <FormControlLabel
+                key={type}
+                control={
+                  <Checkbox
+                    checked={
+                      filter?.type?.find((item) => item === type) ? true : false
+                    }
+                    onChange={handleChangeCheck}
+                    name={type}
+                  />
+                }
+                label={type}
+              />
+            ))}
           </FormGroup>
         </FormControl>
+        <Button onClick={() => dispatch(clearFilter())}>Clear filter</Button>
       </div>
     </section>
   );

@@ -2,8 +2,8 @@ import React from "react";
 
 const Hero: React.FC = () => {
   return (
-    <section className=" py-16">
-      <div className="container mx-auto">
+    <section className=" p-10">
+      <div className="">
         <div className="flex flex-grow flex-col">
           <h2 className="text-3xl font-semibold mb-4">
             Find your <span className="text-blue-500">new job</span> today
@@ -12,16 +12,16 @@ const Hero: React.FC = () => {
             Thousands of jobs in the computer, engineering and technology
             sectors are waiting for you
           </p>
-          <div className="flex">
+          <div className="flex flex-wrap">
             <input
               type="text"
-              placeholder="What position are you looking for ?"
-              className="px-4 py-2 border border-gray-300 rounded-l w-full"
+              placeholder={"What position are you looking for ?"}
+              className="px-4 py-2 border border-gray-300 rounded-l flex-grow"
             />
             <input
               type="text"
               placeholder="Location"
-              className="px-4 py-2 border border-gray-300 rounded-r"
+              className="px-4 py-2 border border-gray-300 rounded-r flex-grow"
             />
             <button className="bg-blue-500 text-white px-4 py-2 rounded-r">
               Search job

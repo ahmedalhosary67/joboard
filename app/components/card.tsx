@@ -51,14 +51,14 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
   //   return { result };
   // }
   return (
-    <Card sx={{ display: "flex" }} className="p-4">
+    <Card sx={{ display: "flex", flexWrap: "wrap" }} className="p-4">
       <LogoDevIcon sx={{ fontSize: 60 }} />
       <CardContent className="gap-4 flex flex-col">
-        {/* <Typography component="div">{job.company}</Typography> */}
+        <Typography component="div">{job?.company?.name}</Typography>
         <Typography component="div" variant="h5">
           {job.title}
         </Typography>
-        <div className="flex justify-between align-middle gap-4">
+        <div className="flex justify-between align-middle gap-4 flex-wrap">
           <Typography
             variant="subtitle1"
             component="div"
@@ -85,7 +85,7 @@ const JobCard: React.FC<JobCardProps> = ({ job }) => {
           >
             <AttachMoneyIcon />
             {job.salary}
-          </Typography> 
+          </Typography>
           {/* <Typography
             variant="subtitle1"
             component="div"

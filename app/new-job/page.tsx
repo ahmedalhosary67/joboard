@@ -6,8 +6,8 @@ import axios from "axios";
 interface JobFormValues {
   title: string;
   description: string;
-  minSalary: string;
-  jobType: string;
+  salary: string;
+  type: string;
   location: string;
 }
 
@@ -15,28 +15,27 @@ const AddJobForm: React.FC = () => {
   const [formValues, setFormValues] = useState<JobFormValues>({
     title: "",
     description: "",
-    minSalary: "",
-    jobType: "",
+    salary: "",
+    type: "",
     location: "",
   });
 
   const [errors, setErrors] = useState<Partial<JobFormValues>>({});
   const [loading, setLoading] = useState(false);
 
-  const jobTypes = [
-    { name: "fullTime", label: "Full-Time" },
-    { name: "temporary", label: "Temporary" },
-    { name: "partTime", label: "Part-Time" },
-  ];
-
+  const filters = {
+    locations: ["Brussels", "Madrid", "Remote"],
+    types: ["Full-Time", "Part-Time", "Temporary"],
+    salary: ["0-30k", "30-60k", "60k+"],
+  }
   const validate = (): boolean => {
     const newErrors: Partial<JobFormValues> = {};
     if (!formValues.title.trim()) newErrors.title = "Job title is required";
     if (!formValues.description.trim())
       newErrors.description = "Job description is required";
-    if (!formValues.minSalary.trim() || isNaN(Number(formValues.minSalary)))
-      newErrors.minSalary = "Minimum salary must be a valid number";
-    if (!formValues.jobType.trim()) newErrors.jobType = "Job type is required";
+    // if (!formValues.salary.trim() || isNaN(Number(formValues.salary)))
+    //   newErrors.salary = "Minimum salary must be a valid number";
+    if (!formValues.type.trim()) newErrors.type = "Job type is required";
     if (!formValues.location.trim())
       newErrors.location = "Location is required";
 
@@ -55,15 +54,18 @@ const AddJobForm: React.FC = () => {
       setLoading(true);
       try {
         // Send the job details to the backend
-        const response = await axios.post("https://fakejobs-api.vercel.app/jobs", formValues);
+        const response = await axios.post(
+          "https://fakejobs-api.vercel.app/jobs",
+          formValues
+        );
         console.log("Job added successfully:", response.data);
         alert("Job added successfully!");
         // Reset form after successful submission
         setFormValues({
           title: "",
           description: "",
-          minSalary: "",
-          jobType: "",
+          salary: "",
+          type: "",
           location: "",
         });
       } catch (error) {
@@ -86,7 +88,7 @@ const AddJobForm: React.FC = () => {
         display: "flex",
         flexDirection: "column",
         gap: 2,
-        alignItems:"flex-start"
+        alignItems: "flex-start",
       }}
     >
       <Typography variant="h5">Post a job</Typography>
@@ -115,38 +117,44 @@ const AddJobForm: React.FC = () => {
         required
       />
 
-      <TextField
-        label="Minimum Salary"
-        name="minSalary"
-        type="number"
-        value={formValues.minSalary}
-        onChange={handleChange}
-        error={!!errors.minSalary}
-        helperText={errors.minSalary}
-        className="w-full lg:w-1/2"
-        required
-      />
 
       <TextField
         select
-        label="Job Type"
-        name="jobType"
-        value={formValues.jobType}
+        label="salary"
+        name="salary"
+        value={formValues.salary}
         onChange={handleChange}
-        error={!!errors.jobType}
-        helperText={errors.jobType}
+        error={!!errors.salary}
+        helperText={errors.salary}
         className="w-full lg:w-1/2"
         required
       >
-        {jobTypes.map((type) => (
-          <MenuItem key={type.name} value={type.name}>
-            {type.label}
+        {filters.salary.map((type) => (
+          <MenuItem key={type} value={type}>
+            {type}
           </MenuItem>
         ))}
       </TextField>
-
       <TextField
-        label="Location"
+        select
+        label="Job Type"
+        name="type"
+        value={formValues.type}
+        onChange={handleChange}
+        error={!!errors.type}
+        helperText={errors.type}
+        className="w-full lg:w-1/2"
+        required
+      >
+        {filters.types.map((type) => (
+          <MenuItem key={type} value={type}>
+            {type}
+          </MenuItem>
+        ))}
+      </TextField>
+      <TextField
+        select
+        label="location"
         name="location"
         value={formValues.location}
         onChange={handleChange}
@@ -154,9 +162,20 @@ const AddJobForm: React.FC = () => {
         helperText={errors.location}
         className="w-full lg:w-1/2"
         required
-      />
+      >
+        {filters.locations.map((type) => (
+          <MenuItem key={type} value={type}>
+            {type}
+          </MenuItem>
+        ))}
+      </TextField>
 
-      <Button type="submit" variant="contained" color="primary"  disabled={loading}>
+      <Button
+        type="submit"
+        variant="contained"
+        color="primary"
+        disabled={loading}
+      >
         {loading ? "Posting..." : "Post Job "}
       </Button>
     </Box>
