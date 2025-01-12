@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Hero from "./components/hero";
 import FilterSection from "./components/filter";
 import JobsSection from "./components/jobs";
@@ -28,7 +27,6 @@ export default async function Home() {
           <FilterSection />
         </div>
         <div className="col-span-3 order-2 xl:order-2 ">
-          {/* Pass the fetched data to the JobsSection */}
           <JobsSection data={data} />
         </div>
         <div className="order-3 xl:order-3  col-span-1">
